@@ -3,45 +3,51 @@ package com.sargames.storemugs
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.*
+import com.sargames.storemugs.ui.screens.LoginScreen
+import com.sargames.storemugs.ui.screens.RegisterScreen
+import com.sargames.storemugs.ui.screens.StoreDashboard
 import com.sargames.storemugs.ui.theme.StoreMugsTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             StoreMugsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                var isLoggedIn by remember { mutableStateOf(false) }
+                var showRegister by remember { mutableStateOf(false) }
+
+                when {
+                    isLoggedIn -> {
+                        StoreDashboard(
+                            onSignOut = {
+                                isLoggedIn = false
+                            }
+                        )
+                    }
+                    showRegister -> {
+                        RegisterScreen(
+                            onRegisterSuccess = {
+                                isLoggedIn = true
+                                showRegister = false
+                            },
+                            onBackToLogin = {
+                                showRegister = false
+                            }
+                        )
+                    }
+                    else -> {
+                        LoginScreen(
+                            onLoginSuccess = {
+                                isLoggedIn = true
+                            },
+                            onNavigateToRegister = {
+                                showRegister = true
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StoreMugsTheme {
-        Greeting("Android")
     }
 }
